@@ -92,6 +92,9 @@ echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
 
 pacman -Syu && pacman -S eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests pipx install bumblebee-status
 
+mkdir /home/$nome_do_usuario/Documentos
+mkdir /home/$nome_do_usuario/.config
+
 cp -a wallpapers /home/$nome_do_usuario/Documentos/
 cp -a .config/* /home/$nome_do_usuario/.config/
 END
