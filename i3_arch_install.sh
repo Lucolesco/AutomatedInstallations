@@ -18,5 +18,16 @@ echo "---------------------------------------------------------"
 echo "Com essas informações, digite qual será o disco escolhido:"
 read disco
 echo "---------------------------------------------------------"
-fdisk $disco
-
+(
+echo o
+echo n
+echo p
+echo 1
+echo 
+echo +1G
+echo n
+echo p
+echo 2
+echo 
+echo w
+) | fdisk $disco
