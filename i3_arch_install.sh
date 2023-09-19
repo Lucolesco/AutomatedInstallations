@@ -60,7 +60,7 @@ sleep 1
 echo "------------------------------------------------------------"
 echo "Insira a senha do usuário \"${nome_de_usuario}\""
 echo "------------------------------------------------------------"
-passwd -R /mnt $nome_do_usuario
+arch-chroot /mnt passwd $nome_do_usuario
 sleep 1
 
 echo "------------------------------------------------------------"
