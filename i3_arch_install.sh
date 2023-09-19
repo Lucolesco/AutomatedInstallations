@@ -66,7 +66,6 @@ echo "------------------------------------------------------------"
 read nome_do_computador
 sleep 1
 
-
 arch-chroot /mnt << END
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc
@@ -90,8 +89,6 @@ cd MyDotFiles/black_white
 echo [multilib] >> /etc/pacman.conf
 echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
 
-pacman -Syu && pacman -S eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests pipx install bumblebee-status
-
 mkdir /home/$nome_do_usuario/Documentos
 mkdir /home/$nome_do_usuario/.config
 
@@ -100,16 +97,16 @@ cp -a .config/* /home/$nome_do_usuario/.config/
 END
 sleep 1
 
-echo "----------------------------------------------------------------"
-echo "Digite a senha do usuário \"${nome_do_usuario}\""
-echo "----------------------------------------------------------------"
-passwd -R /mnt $nome_do_usuario
+pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests 
+arch-chroot /mnt << END
+pipx install bumblebee-status
+END
 
-sleep 3
+sleep 1
 echo "----------------------------------------------------------------"
 echo "Instalação concluída. O computador vai reiniciar em breve."
 echo "----------------------------------------------------------------"
 echo "Aproveite!"
 echo "----------------------------------------------------------------"
-sleep 5
+sleep 3 
 
