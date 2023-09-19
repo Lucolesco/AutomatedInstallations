@@ -17,7 +17,6 @@ sudo fdisk -l | grep "Dis"
 echo "---------------------------------------------------------"
 echo "Com essas informações, digite qual será o disco escolhido:"
 read disco
-echo "\n"
 (
 echo o
 echo n
@@ -35,30 +34,23 @@ echo w
 
 mkfs.ext4 "${disco}2"
 mkswap "${disco}1"
-echo "\n"
 echo "-----------------------------------------------------------"
 echo "Montando as partições..."
 echo "-----------------------------------------------------------"
 sleep 3
-
 mount "${disco}2" /mnt
 swapon "${disco}1"
-
-echo "\n"
 echo "------------------------------------------------------------"
 echo "Instalando pacotes essenciais..."
 echo "------------------------------------------------------------"
 sleep 1
-echo "\n"
 pacstrap -K /mnt base linux linux-firmware firefox networkmanager pipewire pipewire-pulse i3 alacritty grub git gdm
-echo "\n"
 echo "------------------------------------------------------------"
 echo "Gerando FSTAB (configuração do sistema)"
 echo "------------------------------------------------------------"
 sleep 1
-echo "\n"
 genfstab -U /mnt >> /mnt/etc/fstab
-arch-chroot /mnt
+arch-chroot /mnt | (
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc
 echo 'pt_BR.UTF-8 UTF-8' > /etc/locale.gen
@@ -66,14 +58,12 @@ locale-gen
 echo LANG=pt_BR.UTF-8 >> /etc/locale.conf
 echo KEYMAP=br-abnt2 >> /etc/vconsole.conf
 sleep 1
-echo "\n"
 echo "--------------------------------------------------------------"
 echo "Digite o nome do seu computador:"
 echo "--------------------------------------------------------------"
 read nome_do_computador
 echo $nome_do_computador >> /etc/hostname
 sleep 1
-echo "\n"
 echo "---------------------------------------------------------------"
 echo "Digite o nome do usuário:"
 echo "---------------------------------------------------------------"
@@ -84,21 +74,17 @@ echo "Digite a senha do usuário \"${nome_do_usuario}\""
 echo "---------------------------------------------------------------"
 passwd $nome_do_usuario
 sleep 1
-echo "\n"
 echo "--------------------------------------------------------------"
 echo "Digite a senha do usuário ROOT (super-usuário/administrador):"
 echo "--------------------------------------------------------------"
 passwd
 sleep 1
-echo "\n"
 echo "--------------------------------------------------------------"
 echo "Estamos quase terminando... Configurando o boot-loader (GRUB)."
 echo "--------------------------------------------------------------"
-echo "\n"
 sleep 2
 grub-install --target=i386-pc $disco
 grub-mkconfig -o /boot/grub/grub.cfg
-echo "\n"
 echo "--------------------------------------------------------------"
 echo "Aplicando customização e configurações finais..."
 echo "--------------------------------------------------------------"
@@ -116,18 +102,18 @@ cp -a .config/* /home/$nome_de_usuario/.config/
 
 systemctl enable NetworkManager
 systemctl enable gdm
+exit
+)
 
 sleep 3
-echo "\n"
-
 echo "----------------------------------------------------------------"
-echo "Instalação concluída. O computador vai reiniciar em breve.
+echo "Instalação concluída. O computador vai reiniciar em breve."
 echo "----------------------------------------------------------------"
-echo "\n"
 echo "----------------------------------------------------------------"
 echo "Aproveite!"
 echo "----------------------------------------------------------------"
 sleep 5
+reboot
 
 
 
