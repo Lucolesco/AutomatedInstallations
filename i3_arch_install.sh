@@ -10,7 +10,9 @@ sleep 1
 echo "Esses são todos os discos atualmente em seu PC:"
 echo "---------------------------------------------------------"
 sudo fdisk -l | grep "Dis"
+echo "---------------------------------------------------------"
 echo "Com essas informações, digite qual será o disco escolhido:"
+echo "---------------------------------------------------------"
 read disco
 (
 echo o
@@ -30,18 +32,24 @@ mkfs.ext4 "${disco}2"
 mkswap "${disco}1"
 echo "-----------------------------------------------------------"
 echo "Montando as partições..."
+echo "-----------------------------------------------------------"
 sleep 3
 mount "${disco}2" /mnt
 swapon "${disco}1"
+
 echo "------------------------------------------------------------"
 echo "Instalando pacotes essenciais..."
+echo "------------------------------------------------------------"
 sleep 1
 pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub git gdm
+
 echo "------------------------------------------------------------"
 echo "Gerando FSTAB (configuração do sistema)"
+echo "------------------------------------------------------------"
 sleep 1
 genfstab -U /mnt >> /mnt/etc/fstab
 
+echo "-----------------------------------------------------------"
 echo "Digite a senha do super-usuário (ROOT):"
 echo "------------------------------------------------------------"
 passwd -R /mnt
@@ -100,6 +108,9 @@ sleep 1
 pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests 
 
 arch-chroot /mnt pipx install bumblebee-status
+
+arch-chroot /mnt systemctl enable gdm
+arch-chroot /mnt systemctl enable NetworkManager
 
 sleep 1
 echo "----------------------------------------------------------------"
