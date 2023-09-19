@@ -4,15 +4,12 @@ echo "Bem-vindo ao Instalador Automático do Lucolesco!"
 echo "Será instalado o Arch linux com i3-gaps!"
 echo "---------------------------------------------------------"
 sleep 2
-echo "---------------------------------------------------------"
 echo "Primeiro, iremos particionar o disco."
 echo "---------------------------------------------------------"
 sleep 1
-echo "---------------------------------------------------------"
 echo "Esses são todos os discos atualmente em seu PC:"
 echo "---------------------------------------------------------"
 sudo fdisk -l | grep "Dis"
-echo "---------------------------------------------------------"
 echo "Com essas informações, digite qual será o disco escolhido:"
 read disco
 (
@@ -33,22 +30,18 @@ mkfs.ext4 "${disco}2"
 mkswap "${disco}1"
 echo "-----------------------------------------------------------"
 echo "Montando as partições..."
-echo "-----------------------------------------------------------"
 sleep 3
 mount "${disco}2" /mnt
 swapon "${disco}1"
 echo "------------------------------------------------------------"
 echo "Instalando pacotes essenciais..."
-echo "------------------------------------------------------------"
 sleep 1
 pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub git gdm
 echo "------------------------------------------------------------"
 echo "Gerando FSTAB (configuração do sistema)"
-echo "------------------------------------------------------------"
 sleep 1
 genfstab -U /mnt >> /mnt/etc/fstab
 
-echo "------------------------------------------------------------"
 echo "Digite a senha do super-usuário (ROOT):"
 echo "------------------------------------------------------------"
 passwd -R /mnt
@@ -58,6 +51,16 @@ echo "------------------------------------------------------------"
 echo "Digite o nome de usuário:"
 echo "------------------------------------------------------------"
 read nome_do_usuario
+
+arch-chroot /mnt << END
+useradd -m $nome_do_usuario
+END
+sleep 1
+
+echo "------------------------------------------------------------"
+echo "Insira a senha do usuário \"${nome_de_usuario}\""
+echo "------------------------------------------------------------"
+passwd -R /mnt $nome_do_usuario
 sleep 1
 
 echo "------------------------------------------------------------"
@@ -98,6 +101,7 @@ END
 sleep 1
 
 pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests 
+
 arch-chroot /mnt << END
 pipx install bumblebee-status
 END
