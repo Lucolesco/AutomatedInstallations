@@ -51,14 +51,11 @@ echo "------------------------------------------------------------"
 echo "Digite o nome de usuário:"
 echo "------------------------------------------------------------"
 read nome_do_usuario
-
-arch-chroot /mnt << END
-useradd -m $nome_do_usuario
-END
+arch-chroot /mnt useradd -m $nome_do_usuario
 sleep 1
 
 echo "------------------------------------------------------------"
-echo "Insira a senha do usuário \"${nome_de_usuario}\""
+echo "Insira a senha do usuário ${nome_de_usuario}"
 echo "------------------------------------------------------------"
 arch-chroot /mnt passwd $nome_do_usuario
 sleep 1
@@ -102,9 +99,7 @@ sleep 1
 
 pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests 
 
-arch-chroot /mnt << END
-pipx install bumblebee-status
-END
+arch-chroot /mnt pipx install bumblebee-status
 
 sleep 1
 echo "----------------------------------------------------------------"
