@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "---------------------------------------------------------"
 echo "Bem-vindo ao Instalador Automático do Lucolesco!"
 echo "Será instalado o Arch linux com i3-gaps!"
@@ -31,7 +30,6 @@ echo
 echo  
 echo w
 ) | fdisk $disco
-
 mkfs.ext4 "${disco}2"
 mkswap "${disco}1"
 echo "-----------------------------------------------------------"
@@ -50,8 +48,9 @@ echo "Gerando FSTAB (configuração do sistema)"
 echo "------------------------------------------------------------"
 sleep 1
 genfstab -U /mnt >> /mnt/etc/fstab
+arch-chroot /mnt | (
 
-arch-chroot /mnt
+{
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc
 echo 'pt_BR.UTF-8 UTF-8' > /etc/locale.gen
@@ -89,20 +88,18 @@ echo "--------------------------------------------------------------"
 echo "Aplicando customização e configurações finais..."
 echo "--------------------------------------------------------------"
 cd home/$nome_do_usuario/
-
 git clone https://github.com/Lucolesco/MyDotFiles
-
 cd MyDotFiles/black_white
-
 sudo pacman -Syu && sudo pacman -S eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests
 pipx install bumblebee-status
-
 cp -a wallpapers /home/$nome_de_usuario/Documentos/
 cp -a .config/* /home/$nome_de_usuario/.config/
 
 systemctl enable NetworkManager
 systemctl enable gdm
-exit 
+exit
+)
+exit } | arch-chroot /mnt
 
 sleep 3
 echo "----------------------------------------------------------------"
@@ -113,10 +110,4 @@ echo "Aproveite!"
 echo "----------------------------------------------------------------"
 sleep 5
 reboot
-
-
-
-
-
-
 
