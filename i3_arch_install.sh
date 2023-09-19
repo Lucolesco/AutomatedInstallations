@@ -86,15 +86,17 @@ grub-mkconfig -o /boot/grub/grub.cfg
 cd home/$nome_do_usuario/
 git clone https://github.com/Lucolesco/MyDotFiles
 cd MyDotFiles/black_white
+
 pacman -Syu && sudo pacman -S eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests
 pipx install bumblebee-status
+
 cp -a wallpapers /home/$nome_do_usuario/Documentos/
 cp -a .config/* /home/$nome_do_usuario/.config/
 
 systemctl enable NetworkManager
 systemctl enable gdm
-exit
 END
+sleep 1
 
 echo "----------------------------------------------------------------"
 echo "Digite a senha do usuário \"${nome_do_usuario}\""
