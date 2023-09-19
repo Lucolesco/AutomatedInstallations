@@ -8,7 +8,6 @@ echo "---------------------------------------------------------"
 echo "Primeiro, iremos particionar o disco."
 echo "---------------------------------------------------------"
 sleep 1
-echo "\n"
 echo "---------------------------------------------------------"
 echo "Esses são todos os discos atualmente em seu PC:"
 echo "---------------------------------------------------------"
@@ -42,72 +41,71 @@ echo "------------------------------------------------------------"
 echo "Instalando pacotes essenciais..."
 echo "------------------------------------------------------------"
 sleep 1
-pacstrap -K /mnt base linux linux-firmware firefox networkmanager pipewire pipewire-pulse i3 alacritty grub git gdm
+pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub git gdm
 echo "------------------------------------------------------------"
 echo "Gerando FSTAB (configuração do sistema)"
 echo "------------------------------------------------------------"
 sleep 1
 genfstab -U /mnt >> /mnt/etc/fstab
-arch-chroot /mnt | (
 
-{
+echo "------------------------------------------------------------"
+echo "Digite a senha do super-usuário (ROOT):"
+echo "------------------------------------------------------------"
+passwd -R /mnt
+sleep 1
+
+echo "------------------------------------------------------------"
+echo "Digite o nome de usuário:"
+echo "------------------------------------------------------------"
+read nome_do_usuario
+sleep 1
+
+echo "------------------------------------------------------------"
+echo "Digite o nome do computador (hostname):"
+echo "------------------------------------------------------------"
+read nome_do_computador
+sleep 1
+
+
+arch-chroot /mnt << END
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc
 echo 'pt_BR.UTF-8 UTF-8' > /etc/locale.gen
 locale-gen
 echo LANG=pt_BR.UTF-8 >> /etc/locale.conf
 echo KEYMAP=br-abnt2 >> /etc/vconsole.conf
-sleep 1
-echo "--------------------------------------------------------------"
-echo "Digite o nome do seu computador:"
-echo "--------------------------------------------------------------"
-echo teste >> /etc/hostname
-sleep 1
-echo "---------------------------------------------------------------"
-echo "Digite o nome do usuário:"
-echo "---------------------------------------------------------------"
-read nome_do_usuario
-useradd -m nome_do_usuario
-echo "---------------------------------------------------------------"
-echo "Digite a senha do usuário \"${nome_do_usuario}\""
-echo "---------------------------------------------------------------"
-passwd $nome_do_usuario
-sleep 1
-echo "--------------------------------------------------------------"
-echo "Digite a senha do usuário ROOT (super-usuário/administrador):"
-echo "--------------------------------------------------------------"
-passwd
-sleep 1
-echo "--------------------------------------------------------------"
-echo "Estamos quase terminando... Configurando o boot-loader (GRUB)."
-echo "--------------------------------------------------------------"
-sleep 2
+
+echo $nome_do_computador >> /etc/hostname
+
+useradd -m $nome_do_usuario
+echo '${nome_do_usuario} ALL=(ALL:ALL) ALL' >> /etc/sudoers
+
 grub-install --target=i386-pc $disco
 grub-mkconfig -o /boot/grub/grub.cfg
-echo "--------------------------------------------------------------"
-echo "Aplicando customização e configurações finais..."
-echo "--------------------------------------------------------------"
+
 cd home/$nome_do_usuario/
 git clone https://github.com/Lucolesco/MyDotFiles
 cd MyDotFiles/black_white
-sudo pacman -Syu && sudo pacman -S eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests
+pacman -Syu && sudo pacman -S eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests
 pipx install bumblebee-status
-cp -a wallpapers /home/$nome_de_usuario/Documentos/
-cp -a .config/* /home/$nome_de_usuario/.config/
+cp -a wallpapers /home/$nome_do_usuario/Documentos/
+cp -a .config/* /home/$nome_do_usuario/.config/
 
 systemctl enable NetworkManager
 systemctl enable gdm
 exit
-)
-exit } | arch-chroot /mnt
+END
+
+echo "----------------------------------------------------------------"
+echo "Digite a senha do usuário \"${nome_do_usuario}\""
+echo "----------------------------------------------------------------"
+passwd -R /mnt $nome_do_usuario
 
 sleep 3
 echo "----------------------------------------------------------------"
 echo "Instalação concluída. O computador vai reiniciar em breve."
 echo "----------------------------------------------------------------"
-echo "----------------------------------------------------------------"
 echo "Aproveite!"
 echo "----------------------------------------------------------------"
 sleep 5
-reboot
 
