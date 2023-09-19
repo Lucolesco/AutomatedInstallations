@@ -23,11 +23,12 @@ echo o
 echo n
 echo p
 echo 1
-echo 
+echo  
 echo +1G
 echo n
 echo p
 echo 2
-echo 
+echo  
+echo  
 echo w
 ) | fdisk $disco
