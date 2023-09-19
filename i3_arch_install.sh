@@ -24,7 +24,7 @@ echo n
 echo p
 echo 1
 echo  
-echo +1G
+echo +4G
 echo n
 echo p
 echo 2
@@ -32,3 +32,6 @@ echo
 echo  
 echo w
 ) | fdisk $disco
+
+mkfs.ext4 "${disco}2"
+mkswap "${disco}1"
