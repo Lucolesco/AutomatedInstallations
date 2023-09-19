@@ -50,7 +50,8 @@ echo "Gerando FSTAB (configuração do sistema)"
 echo "------------------------------------------------------------"
 sleep 1
 genfstab -U /mnt >> /mnt/etc/fstab
-arch-chroot /mnt | (
+
+(
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc
 echo 'pt_BR.UTF-8 UTF-8' > /etc/locale.gen
@@ -101,8 +102,7 @@ cp -a .config/* /home/$nome_de_usuario/.config/
 
 systemctl enable NetworkManager
 systemctl enable gdm
-exit
-)
+exit ) | arch-chroot /mnt
 
 sleep 3
 echo "----------------------------------------------------------------"
