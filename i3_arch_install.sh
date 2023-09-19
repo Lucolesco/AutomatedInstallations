@@ -61,8 +61,7 @@ sleep 1
 echo "--------------------------------------------------------------"
 echo "Digite o nome do seu computador:"
 echo "--------------------------------------------------------------"
-read nome_do_computador
-echo $nome_do_computador >> /etc/hostname
+echo teste >> /etc/hostname
 sleep 1
 echo "---------------------------------------------------------------"
 echo "Digite o nome do usuário:"
