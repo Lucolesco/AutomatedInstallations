@@ -1,19 +1,37 @@
 #!/bin/bash
-echo "---------------------------------------------------------"
+
+
+clear
+echo "________________________________"
+echo "|    |   |   |   |      \       \ "
+echo "|    |   |   |   |    ___|   _   |"
+echo "|    |   |___|   |   |   |  | |  |"
+echo "|    |____       |   |___|  |_|  |"
+echo "|         |     /        \       /"
+echo "-__---------------------------__-"
+
+echo "_________________________________________________________"
 echo "Bem-vindo ao Instalador Automático do Lucolesco!"
-echo "Será instalado o Arch linux com i3-gaps!"
-echo "---------------------------------------------------------"
-sleep 2
-echo "Primeiro, iremos particionar o disco."
-echo "---------------------------------------------------------"
+echo "Será instalado o Arch Linux com i3-gaps!"
+echo "_________________________________________________________"
 sleep 1
+echo "Primeiro, iremos particionar o disco."
+echo "_________________________________________________________"
+sleep 1
+
 echo "Esses são todos os discos atualmente em seu PC:"
-echo "---------------------------------------------------------"
+echo "_________________________________________________________"
 sudo fdisk -l | grep "Dis"
-echo "---------------------------------------------------------"
+
+echo "_________________________________________________________"
 echo "Com essas informações, digite qual será o disco escolhido:"
-echo "---------------------------------------------------------"
+echo "_________________________________________________________"
 read disco
+
+echo "_________________________________________________________"
+echo "Formatando as partições..."
+echo "_________________________________________________________"
+sleep 1
 (
 echo o
 echo n
@@ -30,48 +48,67 @@ echo w
 ) | fdisk $disco
 mkfs.ext4 "${disco}2"
 mkswap "${disco}1"
-echo "-----------------------------------------------------------"
+sleep 2
+clear
+
+echo "_________________________________________________________"
 echo "Montando as partições..."
-echo "-----------------------------------------------------------"
-sleep 3
+echo "_________________________________________________________"
+sleep 1
 mount "${disco}2" /mnt
 swapon "${disco}1"
+sleep 2
+clear
 
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 echo "Instalando pacotes essenciais..."
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 sleep 1
 pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub git gdm
+sleep 2
+clear
 
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 echo "Gerando FSTAB (configuração do sistema)"
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 sleep 1
 genfstab -U /mnt >> /mnt/etc/fstab
+sleep 2
+clear
 
-echo "-----------------------------------------------------------"
+echo "_________________________________________________________"
 echo "Digite a senha do super-usuário (ROOT):"
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 passwd -R /mnt
 sleep 1
+clear
 
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 echo "Digite o nome de usuário:"
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 read nome_do_usuario
 arch-chroot /mnt useradd -m $nome_do_usuario
 sleep 1
+clear
 
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 echo "Insira a senha do usuário ${nome_de_usuario}"
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 arch-chroot /mnt passwd $nome_do_usuario
 sleep 1
+clear
 
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 echo "Digite o nome do computador (hostname):"
-echo "------------------------------------------------------------"
+echo "_________________________________________________________"
 read nome_do_computador
+sleep 1
+clear
+
+
+echo "_________________________________________________________"
+echo "Aplicando o tema no gerenciador de janelas..."
+echo "_________________________________________________________"
 sleep 1
 
 arch-chroot /mnt << END
@@ -93,6 +130,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 cd home/$nome_do_usuario/
 git clone https://github.com/Lucolesco/MyDotFiles
 cd MyDotFiles/black_white
+echo "file=/home/$nome_do_usuario/Documentos/wallpapers/wall1.png" >> .config/nitrogen/bg-saved.cfg
+echo "dirs=/home/$nome_do_usuario/Documentos/wallpapers;" >> .config/nitrogen/nitrogen.cfg
 
 echo [multilib] >> /etc/pacman.conf
 echo 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
@@ -103,20 +142,31 @@ mkdir /home/$nome_do_usuario/.config
 cp -a wallpapers /home/$nome_do_usuario/Documentos/
 cp -a .config/* /home/$nome_do_usuario/.config/
 END
+sleep 2
+clear
+
+echo "_________________________________________________________"
+echo "Instalando dependências..."
+echo "_________________________________________________________"
 sleep 1
-
 pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests 
-
 arch-chroot /mnt pipx install bumblebee-status
+sleep 2
+clear
 
+echo "_________________________________________________________"
+echo "Ativando serviços do systemd..."
+echo "_________________________________________________________"
+sleep 1
 arch-chroot /mnt systemctl enable gdm
 arch-chroot /mnt systemctl enable NetworkManager
+sleep 2
+clear
 
-sleep 1
-echo "----------------------------------------------------------------"
-echo "Instalação concluída. O computador vai reiniciar em breve."
-echo "----------------------------------------------------------------"
+echo "_________________________________________________________"
+echo "Instalação concluída!"
+echo "_________________________________________________________"
+echo "Digite (reboot) para reiniciar o computador."
+echo "_________________________________________________________"
 echo "Aproveite!"
-echo "----------------------------------------------------------------"
-sleep 3 
-
+echo "_________________________________________________________"
