@@ -28,43 +28,102 @@ echo "Com essas informações, digite qual será o disco escolhido:"
 echo "_________________________________________________________"
 read disco
 
-echo "_________________________________________________________"
-echo "Formatando as partições..."
-echo "_________________________________________________________"
-sleep 1
-(
-echo o
-echo n
-echo p
-echo 1
-echo  
-echo +4G
-echo n
-echo p
-echo 2
-echo  
-echo  
-echo w
-) | fdisk $disco
-mkfs.ext4 "${disco}2"
-mkswap "${disco}1"
-sleep 2
-clear
 
-echo "_________________________________________________________"
-echo "Montando as partições..."
-echo "_________________________________________________________"
-sleep 1
-mount "${disco}2" /mnt
-swapon "${disco}1"
-sleep 2
-clear
+if cat /sys/firmware/efi/fw_platform_size | (grep "64" || grep "32") 
+then
+	echo "You're running in UEFI mode."
+	echo "_________________________________________________________"
+	echo "Formatando as partições..."
+	echo "_________________________________________________________"
+	sleep 1
+	(
+	echo o
+
+	echo n
+	echo p
+	echo 1
+	echo 
+	echo +1G
+	echo t
+	echo EF
+	
+	echo n
+	echo p
+	echo 2
+	echo  
+	echo +4G
+	echo t
+	echo  
+	echo 82
+
+	echo n
+	echo p
+	echo 3
+	echo  
+	echo 
+		
+	echo w
+	) | fdisk $disco
+	
+	mkfs.fat -F 32 "${disco}1"
+	mkswap "${disco}2"
+	mkfs.ext4 "${disco}3"
+
+	sleep 2
+	clear
+
+	echo "_________________________________________________________"
+	echo "Montando as partições..."
+	echo "_________________________________________________________"
+	sleep 1
+	
+	mount --mkdir "${disco}1" /mnt/boot
+	swapon "${disco}2"
+	mount "${disco}3" /mnt
+
+	sleep 2
+	clear
+else
+	echo "You're running in BIOS mode."
+	 
+	echo "_________________________________________________________"
+	echo "Formatando as partições..."
+	echo "_________________________________________________________"
+	sleep 1
+	(
+	echo o
+	echo n
+	echo p
+	echo 1
+	echo  
+	echo +4G
+	echo n
+	echo p
+	echo 2
+	echo  
+	echo  
+	echo w
+	) | fdisk $disco
+	mkfs.ext4 "${disco}2"
+	mkswap "${disco}1"
+	sleep 2
+	clear
+	
+	echo "_________________________________________________________"
+	echo "Montando as partições..."
+	echo "_________________________________________________________"
+	sleep 1
+	mount "${disco}2" /mnt
+	swapon "${disco}1"
+	sleep 2
+	clear
+fi
 
 echo "_________________________________________________________"
 echo "Instalando pacotes essenciais..."
 echo "_________________________________________________________"
 sleep 1
-pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub git gdm
+pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub efibootmgr git gdm
 sleep 2
 clear
 
@@ -105,7 +164,6 @@ read nome_do_computador
 sleep 1
 clear
 
-
 echo "_________________________________________________________"
 echo "Aplicando o tema no gerenciador de janelas..."
 echo "_________________________________________________________"
@@ -124,9 +182,6 @@ echo $nome_do_computador >> /etc/hostname
 useradd -m $nome_do_usuario
 echo '${nome_do_usuario} ALL=(ALL:ALL) ALL' >> /etc/sudoers
 
-grub-install --target=i386-pc $disco
-grub-mkconfig -o /boot/grub/grub.cfg
-
 cd home/$nome_do_usuario/
 git clone https://github.com/Lucolesco/MyDotFiles
 cd MyDotFiles/black_white
@@ -142,6 +197,22 @@ mkdir /home/$nome_do_usuario/.config
 cp -a wallpapers /home/$nome_do_usuario/Documentos/
 cp -a .config/* /home/$nome_do_usuario/.config/
 END
+sleep 2
+clear
+
+echo "________________________________________________________"
+echo "Instalando o GRUB e configurando-o..."
+echo "________________________________________________________"
+sleep 1
+if cat /sys/firmware/efi/fw_platform_size | (grep "64" || grep "32") 
+then
+	mkdir /mnt/boot/efi
+	mount ${disco}1 /mnt/boot/efi
+	arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+else
+	arch-chroot /mnt grub-install --target=i386-pc $disco
+fi
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 sleep 2
 clear
 
