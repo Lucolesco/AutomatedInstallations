@@ -21,13 +21,21 @@ sleep 1
 
 echo "Esses são todos os discos atualmente em seu PC:"
 echo "_________________________________________________________"
-sudo fdisk -l | grep "Dis"
+sudo fdisk -l | grep "/dev/"
 
 echo "_________________________________________________________"
 echo "Com essas informações, digite qual será o disco escolhido:"
 echo "_________________________________________________________"
 read disco
 
+partition=""
+if echo $disco | grep "nvme";
+then
+	partition="${disco}p"
+else
+	partition=${disco}
+fi
+echo $partition
 
 if cat /sys/firmware/efi/fw_platform_size | (grep "64" || grep "32") 
 then
@@ -64,10 +72,10 @@ then
 		
 	echo w
 	) | fdisk $disco
-	
-	mkfs.fat -F 32 "${disco}1"
-	mkswap "${disco}2"
-	mkfs.ext4 "${disco}3"
+
+	mkfs.fat -F 32 "${partition}1"
+	mkswap "${partition}2"
+	mkfs.ext4 "${partition}3"
 
 	sleep 2
 	clear
@@ -75,13 +83,15 @@ then
 	echo "_________________________________________________________"
 	echo "Montando as partições..."
 	echo "_________________________________________________________"
+
 	sleep 1
 	
-	mount --mkdir "${disco}1" /mnt/boot
-	swapon "${disco}2"
-	mount "${disco}3" /mnt
-
+	mount --mkdir "${partition}1" /mnt/boot
+	swapon "${partition}2"
+	mount "${partition}3" /mnt
+	
 	sleep 2
+
 	clear
 else
 	echo "You're running in BIOS mode."
@@ -104,8 +114,8 @@ else
 	echo  
 	echo w
 	) | fdisk $disco
-	mkfs.ext4 "${disco}2"
-	mkswap "${disco}1"
+	mkfs.ext4 "${partition}2"
+	mkswap "${partition}1"
 	sleep 2
 	clear
 	
@@ -113,8 +123,8 @@ else
 	echo "Montando as partições..."
 	echo "_________________________________________________________"
 	sleep 1
-	mount "${disco}2" /mnt
-	swapon "${disco}1"
+	mount "${partition}2" /mnt
+	swapon "${partition}1"
 	sleep 2
 	clear
 fi
@@ -123,7 +133,7 @@ echo "_________________________________________________________"
 echo "Instalando pacotes essenciais..."
 echo "_________________________________________________________"
 sleep 1
-pacstrap -K /mnt base linux linux-firmware sudo firefox networkmanager pipewire pipewire-pulse i3 i3-gaps alacritty grub efibootmgr git gdm
+pacstrap -K /mnt base linux linux-firmware sudo networkmanager pipewire pipewire-pulse i3 i3-gaps grub efibootmgr git gdm
 sleep 2
 clear
 
@@ -207,7 +217,7 @@ sleep 1
 if cat /sys/firmware/efi/fw_platform_size | (grep "64" || grep "32") 
 then
 	mkdir /mnt/boot/efi
-	mount ${disco}1 /mnt/boot/efi
+	mount "${partition}1" /mnt/boot/efi
 	arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 else
 	arch-chroot /mnt grub-install --target=i386-pc $disco
@@ -220,7 +230,7 @@ echo "_________________________________________________________"
 echo "Instalando dependências..."
 echo "_________________________________________________________"
 sleep 1
-pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests 
+pacstrap -C /mnt/etc/pacman.conf -K /mnt eog thunar ttf-font-awesome python nitrogen rofi alacritty python-pipx playerctl python-dbus python-requests firefox
 arch-chroot /mnt pipx install bumblebee-status
 sleep 2
 clear
