@@ -133,7 +133,7 @@ echo "_________________________________________________________"
 echo "Instalando pacotes essenciais..."
 echo "_________________________________________________________"
 sleep 1
-pacstrap -K /mnt base linux linux-firmware sudo networkmanager pipewire pipewire-pulse grub efibootmgr git lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
+pacstrap -K /mnt base linux linux-firmware sudo networkmanager pipewire pipewire-pulse grub efibootmgr git xorg-xinit 
 sleep 2
 clear
 
@@ -230,7 +230,6 @@ echo "_________________________________________________________"
 echo "Ativando serviços do systemd..."
 echo "_________________________________________________________"
 sleep 1
-arch-chroot /mnt systemctl enable lightdm 
 arch-chroot /mnt systemctl enable NetworkManager
 sleep 2
 clear
